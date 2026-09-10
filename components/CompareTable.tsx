@@ -1,8 +1,10 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { AccessBadge, DifficultyBadge } from './Badge';
+import { ACCESS_GROUP_LABEL } from './SpotVisuals';
 
 export interface CompareRow {
   id: string;
@@ -19,8 +21,9 @@ export interface CompareRow {
 }
 
 export default function CompareTable({ rows }: { rows: CompareRow[] }) {
-  const [region, setRegion] = useState('all');
-  const [access, setAccess] = useState('all');
+  const searchParams = useSearchParams();
+  const [region, setRegion] = useState(searchParams.get('region') ?? 'all');
+  const [access, setAccess] = useState(searchParams.get('access') ?? 'all');
   const [query, setQuery] = useState('');
 
   const regions = useMemo(() => Array.from(new Set(rows.map((r) => r.regionName))), [rows]);
@@ -36,41 +39,77 @@ export default function CompareTable({ rows }: { rows: CompareRow[] }) {
 
   return (
     <div>
-      <div className="mb-5 flex flex-wrap gap-3">
+      <div className="mb-5 flex flex-wrap items-center gap-3">
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search a spot or area…"
+          placeholder="Search a spot or area..."
           className="rounded-full border border-lagoon-deep/20 px-4 py-2 text-sm"
         />
-        <select
-          value={region}
-          onChange={(e) => setRegion(e.target.value)}
-          className="rounded-full border border-lagoon-deep/20 px-4 py-2 text-sm font-semibold"
-        >
-          <option value="all">All regions</option>
-          {regions.map((r) => (
-            <option key={r} value={r}>
-              {r}
-            </option>
-          ))}
-        </select>
-        <select
-          value={access}
-          onChange={(e) => setAccess(e.target.value)}
-          className="rounded-full border border-lagoon-deep/20 px-4 py-2 text-sm font-semibold"
-        >
-          <option value="all">Any access type</option>
-          {accessTypes.map((a) => (
-            <option key={a} value={a}>
-              {a.replace('_', ' ')}
-            </option>
-          ))}
-        </select>
         <span className="ml-auto self-center text-sm font-semibold text-ink/60">
           {filtered.length} of {rows.length} spots
         </span>
+      </div>
+
+      <div className="mb-3 flex flex-wrap gap-2" role="group" aria-label="Filter by region">
+        <button
+          type="button"
+          onClick={() => setRegion('all')}
+          aria-pressed={region === 'all'}
+          className={`rounded-full border px-3.5 py-1.5 text-xs font-bold ${
+            region === 'all'
+              ? 'border-lagoon-deep bg-lagoon-deep text-[#EAFBF8]'
+              : 'border-lagoon-deep/15 bg-white text-ink/70'
+          }`}
+        >
+          All regions
+        </button>
+        {regions.map((r) => (
+          <button
+            key={r}
+            type="button"
+            onClick={() => setRegion(r)}
+            aria-pressed={region === r}
+            className={`rounded-full border px-3.5 py-1.5 text-xs font-bold ${
+              region === r
+                ? 'border-lagoon-deep bg-lagoon-deep text-[#EAFBF8]'
+                : 'border-lagoon-deep/15 bg-white text-ink/70'
+            }`}
+          >
+            {r}
+          </button>
+        ))}
+      </div>
+
+      <div className="mb-6 flex flex-wrap gap-2" role="group" aria-label="Filter by access type">
+        <button
+          type="button"
+          onClick={() => setAccess('all')}
+          aria-pressed={access === 'all'}
+          className={`rounded-full border px-3.5 py-1.5 text-xs font-bold ${
+            access === 'all'
+              ? 'border-coral-deep bg-coral text-[#241009]'
+              : 'border-lagoon-deep/15 bg-white text-ink/70'
+          }`}
+        >
+          Any access type
+        </button>
+        {accessTypes.map((a) => (
+          <button
+            key={a}
+            type="button"
+            onClick={() => setAccess(a)}
+            aria-pressed={access === a}
+            className={`rounded-full border px-3.5 py-1.5 text-xs font-bold ${
+              access === a
+                ? 'border-coral-deep bg-coral text-[#241009]'
+                : 'border-lagoon-deep/15 bg-white text-ink/70'
+            }`}
+          >
+            {ACCESS_GROUP_LABEL[a]?.split(':')[0] ?? a.replace('_', ' ')}
+          </button>
+        ))}
       </div>
 
       <div className="overflow-x-auto rounded-2xl border border-lagoon-deep/10">

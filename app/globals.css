@@ -39,3 +39,35 @@ body {
   transform: rotate(45deg);
   font-size: 13px;
 }
+
+.wfc-bubble {
+  position: absolute;
+  bottom: -40px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.05) 70%);
+  opacity: 0.55;
+  animation-name: wfc-rise;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+@keyframes wfc-rise {
+  0% {
+    transform: translateY(0) translateX(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.55;
+  }
+  100% {
+    transform: translateY(-540px) translateX(var(--drift, 20px));
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wfc-bubble {
+    animation: none;
+    opacity: 0.25;
+  }
+}

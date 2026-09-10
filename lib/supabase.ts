@@ -34,6 +34,8 @@ export interface Area {
   blurb: string | null;
   access_note: string | null;
   entrance_fee_text: string | null;
+  best_time_text: string | null;
+  getting_there: string | null;
   sort_order: number;
 }
 
@@ -50,6 +52,7 @@ export interface Spot {
   depth_max_ft: number | null;
   marine_life: string[] | null;
   description: string | null;
+  tips: string | null;
   latitude: number | null;
   longitude: number | null;
   coord_precision: 'exact' | 'approximate' | 'area_level';
@@ -176,4 +179,42 @@ export async function getAllSpotsForCompare(): Promise<
     const region = (regions ?? []).find((r) => r.id === area?.region_id) as Region;
     return { ...spot, area, region };
   });
+}
+
+export interface SiteStats {
+  totalSpots: number;
+  totalAreas: number;
+  totalRegions: number;
+  totalOperators: number;
+}
+
+export async function getSiteStats(): Promise<SiteStats> {
+  const [spots, areas, regions, operators] = await Promise.all([
+    supabase.from('spots').select('id', { count: 'exact', head: true }),
+    supabase.from('areas').select('id', { count: 'exact', head: true }),
+    supabase.from('regions').select('id', { count: 'exact', head: true }),
+    supabase.from('operators').select('id', { count: 'exact', head: true }),
+  ]);
+  return {
+    totalSpots: spots.count ?? 0,
+    totalAreas: areas.count ?? 0,
+    totalRegions: regions.count ?? 0,
+    totalOperators: operators.count ?? 0,
+  };
+}
+
+export async function getAllOperatorsWithSpots(): Promise<
+  (Operator & { listings: (SpotOperator & { spot: Spot & { area: Area } })[] })[]
+> {
+  const { data: operators, error } = await supabase.from('operators').select('*').order('name');
+  if (error) throw error;
+
+  const { data: spotOperatorRows } = await supabase
+    .from('spot_operators')
+    .select('*, spot:spots(*, area:areas(*))');
+
+  return (operators ?? []).map((op) => ({
+    ...op,
+    listings: (spotOperatorRows ?? []).filter((so: any) => so.operator_id === op.id) as any,
+  }));
 }
