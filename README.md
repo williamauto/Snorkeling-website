@@ -17,7 +17,7 @@ or permit), with depth, difficulty, marine life, a practical planning tip, and a
 - 3 regions: Fort Lauderdale Area, Miami, Florida Keys
 - 10 named beach areas (sub-destination pages), each with a best-time-to-go note and a getting-there
   summary, e.g. Lauderdale-by-the-Sea, Key Biscayne, Islamorada
-- 32 named snorkeling spots (reefs, wrecks, artificial reefs, and parks), grouped within each area by
+- 45 named snorkeling spots (reefs, wrecks, artificial reefs, and parks), grouped within each area by
   access type, with depth range, difficulty, marine life, a planning tip, and a cited source
 - 6 real, verified operators (dive shops / rental shops) linked to the spots they actually serve; no
   placeholder businesses or invented pricing
